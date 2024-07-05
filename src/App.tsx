@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
-
 import Chart1 from './components/chart1'
-import Chart2 from './components/chart2'
+import ChartWrapper from './components/chart2-wrapper'
 
 function App() {
   const [absolutne, setAbsolutne] = useState<any>(undefined)
@@ -41,13 +40,9 @@ function App() {
         <Chart1 data={celkove} type="Vývoz" color="#0FA3B1" />
         <Chart1 data={celkove} type="Dovoz" color="#0FA3B1" />
       </div>
-      <h2 className="text-xl font-semibold pt-10">Struktura českého high-tech vývozu a dovozu</h2>
-
-      <div>
-        <Chart2 data={absolutne} type="Vývoz" />
-        <Chart2 data={absolutne} type="Dovoz" />
-      </div>
-
+      < ChartWrapper
+        absolutne={absolutne}
+      />
     </div>
   )
 }

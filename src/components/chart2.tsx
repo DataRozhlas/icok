@@ -1,40 +1,60 @@
 import Highcharts from 'highcharts';
+import HighchartsSeriesLabel from 'highcharts/modules/series-label';
 import { HighchartsChart, HighchartsProvider, Chart, Legend, AreaSeries, XAxis, YAxis, Tooltip } from "react-jsx-highcharts";
 
+// Initialize the series-label module
+HighchartsSeriesLabel(Highcharts);
 
 
 type PropsType = {
     data: string[][];
     type: string;
+    selected: string;
+    view: string;
+}
 
+
+const prepareData = (data: string[][], type: string, selected: string) => {
+    const years = data.find((row) => row[0] === 'Směr')?.slice(3).map((year) => year);
+
+    const cleanData = data.filter((row) => row[0] === type).map((row) => row.map((value, index) => {
+        if (index < 3) return value;
+        return isNaN(parseFloat(value.replace(',', ''))) ? 0 : parseFloat(value.replace(',', ''))
+    }));
+
+    if (selected === 'all') {
+        const result = cleanData.reduce((acc: any[], row: any[]): any[] => {
+            const clean = row.slice(3)
+            const existing = acc.find(item => item.name === row[1]);
+            if (existing) {
+                existing.data = existing.data.map((value: number, index: number) => value + clean[index]);
+                const newAcc = [...acc.filter(item => item.name !== row[1]), existing];
+                return newAcc
+            }
+            const newAcc = [...acc, { name: row[1], data: clean }];
+            return newAcc;
+        }, []);
+        return result;
+    }
+
+    const result = cleanData.filter((row) => row[1] === selected).map((row) => {
+        return {
+            name: row[2], data: row.slice(3).map((value, index) => {
+                return { x: parseInt(years?.[index] ?? ''), y: value }
+            })
+        }
+    })
+    return result;
 }
 
 
 function Chart2(props: PropsType) {
     //process data
-    const years = props.data.find((row) => row[0] === 'Směr')?.slice(3).map((year) => year);
-    const data = props.data.filter((row) => row[0] === props.type).map((row) => row.map((value, index) => {
-        if (index < 3) return value;
-        return isNaN(parseFloat(value.replace(',', ''))) ? 0 : parseFloat(value.replace(',', ''))
-    }));
-    const cleanData = data.reduce((acc: any[], row: any[]): any[] => {
-        const clean = row.slice(3)
-        const existing = acc.find(item => item.name === row[1]);
-        if (existing) {
-            existing.data = existing.data.map((value: number, index: number) => value + clean[index]);
-            const newAcc = [...acc.filter(item => item.name !== row[1]), existing];
-            return newAcc
-        }
-        const newAcc = [...acc, { name: row[1], data: clean, drilldown: row[1] }];
-        return newAcc;
-    }, []);
 
-    const drilldownData = cleanData.map((item) => {
-        return { id: item.name, name: item.name, type: "area", data: data.filter((row) => row[1] === item.name).map((row) => row.slice(2)) }
 
-    })
 
-    console.log("drill", drilldownData, "clean", cleanData)
+    const data = prepareData(props.data, props.type, props.selected);
+
 
     return (
         <HighchartsProvider Highcharts={Highcharts}>
@@ -43,46 +63,38 @@ function Chart2(props: PropsType) {
             <HighchartsChart
                 plotOptions={{
                     area: {
-                        stacking: 'percent',
+                        stacking: props.view === "rel" ? 'percent' : 'normal',
+                        marker: {
+                            enabled: false
+                        },
+                        lineColor: "white",
+                        lineWidth: 1,
+
                     },
                     series: {
                         animation: false,
-                        states: { hover: { enabled: false } }, // disable hover
+                        states: { hover: { enabled: false } },
+                        label: {
+                            enabled: true,
+                            connectorAllowed: false
+                        } // disable hover
                     }
-                }}
-                drilldown={{
-                    breadcrumbs: {
-                        position: {
-                            align: 'right'
-                        }
-                    },
-                    series: [
-                        { name: "Výzbroj", id: "0", type: "line", data: [1, 2, 3, 4] },
-                    ]
-
-                }}
-
-            >
+                }}            >
 
                 <Chart height={450} />
 
-                <Legend layout="horizontal" align="center" verticalAlign="top" reversed={true} symbolRadius={2} />
+                <Legend layout="horizontal" align="center" verticalAlign="bottom" reversed={true} symbolRadius={2} />
 
-                <Tooltip shared valueSuffix=' %' formatter={function () {
-                    const highTechPoint = this.points?.find(point => point.series.name === 'high-tech');
-                    if (highTechPoint) {
-                        return `<strong>${this.point.category}</strong> ${props.type} ${highTechPoint.series.name}: ${highTechPoint.y?.toLocaleString("cs-CZ")} %`;
-                    }
-                    return '';
-                }} />
+                <Tooltip split={true} shared />
 
-                <XAxis categories={years} crosshair={true} labels={{ rotation: -45 }} />
+                <XAxis tickWidth={1} min={1993} max={2023} crosshair={true} />
 
 
                 <YAxis labels={{ formatter: function () { return this.isLast ? `${this.value.toString()} %` : this.value.toString(); } }}>
-                    {cleanData.reverse().map((item, index) => (
-                        <AreaSeries key={item.name} name={item.name} drilldown={"0"} data={item.data} />
-                    ))}
+                    {data.reverse().map((item) => {
+                        return <AreaSeries key={item.name} name={item.name} data={item.data}
+                        />
+                    })}
                 </YAxis>
             </HighchartsChart>
         </HighchartsProvider >
