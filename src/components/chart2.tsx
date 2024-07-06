@@ -5,6 +5,12 @@ import { HighchartsChart, HighchartsProvider, Chart, Legend, AreaSeries, XAxis, 
 // Initialize the series-label module
 HighchartsSeriesLabel(Highcharts);
 
+Highcharts.setOptions({
+    lang: {
+        numericSymbols: [" tis.", " mil.", " mld.", " bil."],
+    }
+});
+
 
 type PropsType = {
     data: string[][];
@@ -19,7 +25,7 @@ const prepareData = (data: string[][], type: string, selected: string) => {
 
     const cleanData = data.filter((row) => row[0] === type).map((row) => row.map((value, index) => {
         if (index < 3) return value;
-        return isNaN(parseFloat(value.replace(',', ''))) ? 0 : parseFloat(value.replace(',', ''))
+        return isNaN(parseFloat(value.replace(',', ''))) ? 0 : parseFloat(value.replace(',', '')) / 1000
     }));
     if (selected === 'all') {
         const result = cleanData.reduce((acc: any[], row: any[]): any[] => {
@@ -67,6 +73,8 @@ function Chart2(props: PropsType) {
 
     const data = prepareData(props.data, props.type, props.selected);
 
+    const colors = props.selected === "Elektronické a telekomunikační zboží" ? ["#f18d21", "#f37978", "#19979d", "#284f72"] : ["#f18d21", "#284f72", "#19979d", "#6e557c", "#ba5b8d", "#f37978"]
+
     return (
         <HighchartsProvider Highcharts={Highcharts}>
             <h3 className="">{props.type}</h3>
@@ -94,16 +102,16 @@ function Chart2(props: PropsType) {
 
                 <Chart height={450} />
 
-                <Legend layout="horizontal" align="center" verticalAlign="bottom" reversed={true} symbolRadius={2} />
+                <Legend layout="horizontal" align="center" verticalAlign="bottom" reversed={true} symbolRadius={2} squareSymbol={true} />
 
-                <Tooltip split={true} shared />
+                <Tooltip split={false} shared valueDecimals={1} valueSuffix={props.view === "rel" ? " %" : " mld. Kč"} />
 
                 <XAxis tickWidth={1} min={1993} max={2023} crosshair={true} />
 
 
-                <YAxis labels={{ formatter: function () { return this.isLast ? `${this.value.toString()} %` : this.value.toString(); } }}>
-                    {data.reverse().map((item) => {
-                        return <AreaSeries key={item.name} name={item.name} data={item.data}
+                <YAxis labels={{ formatter: function () { return this.isLast ? props.view === "rel" ? `${this.value.toString()} %` : `${this.value.toLocaleString("cs-CZ")} mld. Kč` : this.value.toLocaleString("cs-CZ"); } }}>
+                    {data.reverse().map((item, index) => {
+                        return <AreaSeries key={item.name} name={item.name} data={item.data} color={colors[index]}
                         />
                     })}
                 </YAxis>

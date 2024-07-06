@@ -22,7 +22,7 @@ function Chart1(props: PropsType) {
             <HighchartsChart plotOptions={{
                 column: {
                     pointPadding: 0,
-                    groupPadding: 0.05,
+                    groupPadding: 0,
                     stacking: 'normal',
                 },
                 series: {
@@ -46,16 +46,22 @@ function Chart1(props: PropsType) {
 
                 <YAxis max={100} labels={{ formatter: function () { return this.isLast ? `${this.value.toString()} %` : this.value.toString(); } }}>
                     <ColumnSeries name="ostatní zboží" data={complementary} color={"#f4f4f5"} />
-                    <ColumnSeries name="high-tech" data={data} color={props.color} dataLabels={{
+                    <ColumnSeries name="high-tech" color={props.color} data={data?.map((item, index) => { return { y: item, color: index === 27 ? "#0c828e" : props.color } })} dataLabels={{
                         enabled: true,
                         inside: false,
                         allowOverlap: true,
                         crop: false,
                         color: 'black',
                         rotation: 270,
+                        style: {
+                            fontSize: '0.65em',
+                        },
                         formatter: function () {
                             if (this.point.index === 0 || this.point.index === this.series.data.length - 1) {
                                 return `${Math.floor(this?.point?.y ?? 0)} %`
+                            }
+                            if (this.point.index === 27) {
+                                return `maximum`
                             }
 
                             return ""

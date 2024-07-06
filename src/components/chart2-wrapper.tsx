@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import {
     Select,
@@ -19,12 +19,19 @@ function ChartWrapper({ absolutne }: { absolutne: any }) {
     const [selectedCategory, setSelectedCategory] = useState<string>('Elektronické a telekomunikační zboží')
     const [view, setView] = useState<string>('rel')
 
+    useEffect(() => {
+        if (selectedCategory === "Výzbroj") {
+            setView("abs")
+        }
+    }, [selectedCategory, view])
+
 
     return (
         <>
-            <h2 className="text-xl font-semibold pt-10">Struktura českého high-tech vývozu a dovozu</h2>
-            <div className="flex gap-6 py-3">
+            <h2 className="text-xl font-semibold mt-10">Struktura českého high-tech vývozu a dovozu</h2>
+            <div className="flex items-end gap-6 py-3">
                 <div>
+                    <Label htmlFor="category">Vyberte kategorii</Label>
                     <Select defaultValue={selectedCategory} onValueChange={(value) => setSelectedCategory(value)}>
                         <SelectTrigger className="w-[300px]">
                             <SelectValue placeholder="Vyberte kategorii" />
@@ -44,7 +51,7 @@ function ChartWrapper({ absolutne }: { absolutne: any }) {
                     </Select>
                 </div>
                 <div>
-                    <RadioGroup defaultValue={view} onValueChange={(value) => setView(value)}>
+                    <RadioGroup defaultValue={view} onValueChange={(value) => setView(value)} disabled={selectedCategory === "Výzbroj"}>
                         <div className="flex items-center space-x-2">
                             <RadioGroupItem value="abs" id="abs" />
                             <Label htmlFor="abs">absolutně</Label>
@@ -54,9 +61,11 @@ function ChartWrapper({ absolutne }: { absolutne: any }) {
                             <Label htmlFor="rel">relativně</Label>
                         </div>
                     </RadioGroup>
-
                 </div>
+
             </div>
+            {selectedCategory === "Výzbroj" && <p className="text-xs pb-3">U výzbroje není k dispozici podrobnější členění. Vývoz výzbroje také nezachycuje úplný rozsah této kategorie z důvodu možného utajení.</p>}
+
             <div>
                 <Chart2 data={absolutne} type="Vývoz" selected={selectedCategory} view={view} />
                 <Chart2 data={absolutne} type="Dovoz" selected={selectedCategory} view={view} />

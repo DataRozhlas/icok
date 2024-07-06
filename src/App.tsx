@@ -35,10 +35,16 @@ function App() {
 
   return (
     <div className="max-w-3xl mx-auto">
-      <h2 className="text-xl font-semibold">Podíl high-tech zboží na českém vývozu a dovozu</h2>
-      <div className="space-y-3">
-        <Chart1 data={celkove} type="Vývoz" color="#0FA3B1" />
-        <Chart1 data={celkove} type="Dovoz" color="#0FA3B1" />
+      <h2 className="text-xl font-semibold mt-4">Podíl high-tech zboží na českém vývozu a dovozu</h2>
+      <div className="space-y-3 lg:space-y-0 lg:flex lg:space-x-1">
+        <div className="lg:w-1/2">
+
+          <Chart1 data={celkove} type="Vývoz" color="#0FA3B1" />
+        </div>
+        <div className="lg:w-1/2">
+
+          <Chart1 data={celkove} type="Dovoz" color="#0FA3B1" />
+        </div>
       </div>
       < ChartWrapper
         absolutne={absolutne}
