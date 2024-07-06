@@ -9,6 +9,11 @@ function App() {
   const [loading, setLoading] = useState<boolean>(true)
 
 
+  //    const complementary = data?.map((value) => 50 - value) ?? [];
+
+
+
+
   useEffect(() => {
     Promise.all([
       fetch('https://worker-muddy-disk-d6e4.jan-cibulka-ee5.workers.dev/?spreadsheetId=1pWQS5GZ48-HcNaImxETlA4b8Jc9We703yocDEIIejpI&sheet=absolutne')
@@ -26,6 +31,7 @@ function App() {
       setLoading(false);
     });
   }, [])
+
 
   if (loading) return (
     <div className="flex justify-center items-center h-screen">

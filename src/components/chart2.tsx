@@ -48,7 +48,6 @@ const prepareData = (data: string[][], type: string, selected: string) => {
                 name: row[1], data: newData
             }];
 
-            console.log(newAcc);
             return newAcc;
         }, []);
         return result;
