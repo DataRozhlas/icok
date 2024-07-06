@@ -21,22 +21,34 @@ const prepareData = (data: string[][], type: string, selected: string) => {
         if (index < 3) return value;
         return isNaN(parseFloat(value.replace(',', ''))) ? 0 : parseFloat(value.replace(',', ''))
     }));
-
     if (selected === 'all') {
         const result = cleanData.reduce((acc: any[], row: any[]): any[] => {
             const clean = row.slice(3)
             const existing = acc.find(item => item.name === row[1]);
-            if (existing) {
-                existing.data = existing.data.map((value: number, index: number) => value + clean[index]);
+            if (existing !== undefined) {
+                existing.data = existing.data.map((value: { x: number, y: number }, index: number) => ({
+                    x: value.x,
+                    y: value.y + clean[index]
+                }));
                 const newAcc = [...acc.filter(item => item.name !== row[1]), existing];
                 return newAcc
             }
-            const newAcc = [...acc, { name: row[1], data: clean }];
+
+            const newData = clean.map((value, index) => {
+                return { x: parseInt(years?.[index] ?? ''), y: value }
+            })
+
+            const newAcc = [...acc, {
+                name: row[1], data: newData
+            }];
+
+            console.log(newAcc);
             return newAcc;
         }, []);
         return result;
     }
 
+    // single categorie
     const result = cleanData.filter((row) => row[1] === selected).map((row) => {
         return {
             name: row[2], data: row.slice(3).map((value, index) => {
@@ -54,7 +66,6 @@ function Chart2(props: PropsType) {
 
 
     const data = prepareData(props.data, props.type, props.selected);
-
 
     return (
         <HighchartsProvider Highcharts={Highcharts}>
