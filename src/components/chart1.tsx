@@ -2,6 +2,40 @@ import Highcharts from 'highcharts';
 import HighchartsAnnotations from 'highcharts/modules/annotations';
 import { HighchartsChart, HighchartsProvider, Chart, ColumnSeries, XAxis, YAxis, Tooltip } from "react-jsx-highcharts";
 
+import exporting from 'highcharts/modules/exporting';
+import offlineExporting from 'highcharts/modules/offline-exporting';
+import exportData from 'highcharts/modules/export-data';
+
+exporting(Highcharts);
+offlineExporting(Highcharts);
+exportData(Highcharts);
+
+Highcharts.setOptions({
+    lang: {
+        numericSymbols: [" tis.", " mil.", " mld.", " bil."],
+        downloadPNG: "Stáhnout obrázek ve formátu PNG",
+        downloadXLS: "Stáhnout data ve formátu XLS",
+    },
+    exporting: {
+        buttons: {
+            contextButton: {
+                enabled: false
+            },
+            exportButton: {
+                text: 'Stáhnout',
+                // Use only the download related menu items from the default
+                // context button
+                menuItems: [
+                    'downloadPNG',
+                    'downloadXLS',
+                ]
+            },
+        },
+        filename: 'icok',
+        enabled: true,
+    },
+});
+
 HighchartsAnnotations(Highcharts);
 
 type PropsType = {

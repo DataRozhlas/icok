@@ -30,11 +30,11 @@ function ChartWrapper({ absolutne }: { absolutne: any }) {
         <>
             <h2 className="text-xl font-semibold mt-10">Struktura českého high-tech vývozu a dovozu</h2>
             <div className="flex justify-center">
-                <div className="flex items-end gap-6 py-3">
+                <div className="flex items-end  flex-wrap gap-6 py-3 pb-6">
                     <div>
                         <Label htmlFor="category">Vyberte kategorii</Label>
                         <Select defaultValue={selectedCategory} onValueChange={(value) => setSelectedCategory(value)}>
-                            <SelectTrigger className="w-[300px]">
+                            <SelectTrigger className="min-w-[280px]">
                                 <SelectValue placeholder="Vyberte kategorii" />
                             </SelectTrigger>
                             <SelectContent>

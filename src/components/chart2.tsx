@@ -2,13 +2,13 @@ import Highcharts from 'highcharts';
 import HighchartsSeriesLabel from 'highcharts/modules/series-label';
 import { HighchartsChart, HighchartsProvider, Chart, Legend, AreaSeries, XAxis, YAxis, Tooltip } from "react-jsx-highcharts";
 
-// Initialize the series-label module
+
 HighchartsSeriesLabel(Highcharts);
 
 Highcharts.setOptions({
     lang: {
         numericSymbols: [" tis.", " mil.", " mld.", " bil."],
-    }
+    },
 });
 
 
